@@ -25,8 +25,8 @@ for folder in sorted(glob.glob("/ssdrive/WinEarthPhotosByKeyword/*")):
         cat_dict[folder].append(image)
 
 #print("loaded all images")
-#joblib.dump(cat_dict, "images.joblib")
-cat_dict = joblib.load("images.joblib")
+joblib.dump(cat_dict, "images.joblib")
+# cat_dict = joblib.load("images.joblib")
 # images = joblib.load("images.joblib")
 
 
@@ -34,10 +34,10 @@ reps = []
 labels = []
 for cat in sorted(cat_dict.keys()):
     print("representing {}".format(cat))
-    representations = model.predict(np.array(cat_dict[cat])[:3])
+    representations = model.predict(np.array(cat_dict[cat]))
     reps.extend(representations)
     for _ in range(len(cat_dict[cat])):
         labels.append(cat)
 
-joblib.dump((reps, cat), "representations.joblib")
+joblib.dump((reps, labels), "representations.joblib")
 
