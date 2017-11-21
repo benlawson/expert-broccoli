@@ -31,10 +31,13 @@ cat_dict = joblib.load("images.joblib")
 
 
 reps = []
+labels = []
 for cat in sorted(cat_dict.keys()):
     print("representing {}".format(cat))
     representations = model.predict(np.array(cat_dict[cat]))
     reps.extend(representations)
+    for _ in range(len(cat_dict[cat])):
+        labels.append(cat)
 
-joblib.dump(reps, "representations.joblib")
+joblib.dump((reps, cat), "representations.joblib")
 
