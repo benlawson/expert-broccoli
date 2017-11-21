@@ -9,14 +9,17 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.preprocessing import label_binarize
 from xgboost import XGBClassifier
+from keras.models import load_model
 import joblib
 from joblib import Parallel, delayed
+
 
 names = ["Nearest Neighbors", "SVM", "Decision Tree", "Random Forest", "Neural Net", "AdaBoost", "Naive Bayes", "LDA", "XGBoost"]
 
 filenames = ["nearestneighbors", "svm", "decisiontree", "randomforest", "neuralnet", "adaboost", "naivebayes", "lda", "xgb"]
+inception_filenames = ["inception_epoch-02", "inception_epoch-05", "inception_epoch-08", "inception_epoch-final"]
 
-
+inception_model_path = '/path'
 classifiers = [
     KNeighborsClassifier(3),
     SVC(kernel="linear", C=0.025),
@@ -28,6 +31,15 @@ classifiers = [
     QuadraticDiscriminantAnalysis(),
     XGBClassifier()
     ]
+
+inception_models = [
+    load_model(inception_model_path + 'finetuned_model_epoch-02.hdf5'),
+    load_model(inception_model_path + 'finetuned_model_epoch-05.hdf5'),
+    load_model(inception_model_path + 'finetuned_model_epoch-08.hdf5'),
+    load_model(inception_model_path + 'finetuned_model_epoch-final.hdf5')
+    ]
+
+
 
 X, labels = joblib.load("representations.joblib")
 
@@ -58,8 +70,12 @@ def train_save(model, filename):
     except ValueError:
         print("{0}: {1} acc".format(filename, model.score(X_test, y_test_array)))
 
-
 Parallel(n_jobs=-1)(delayed(train_save)(m, f) for (m,f) in zip(classifiers, filenames))
+
+# preprocessed image data for keras model
+X , labels = joblib.load("preprocessed_imgs.joblib")
+X_train, X_test, y_train, y_test =  train_test_split(X, y, random_state=42)
+joblib.dump((X_train, X_test, y_train, y_test), "imgs_testdata.joblib")
 
 #for model, filename in zip(classifiers, filenames):
 #    model.fit(X_train, y_train)
