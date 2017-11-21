@@ -7,9 +7,10 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-from sklearn.preprocessing import label_binarize
+# from sklearn.preprocessing import label_binarize
 from xgboost import XGBClassifier
-from keras.models import load_model
+# from keras.models import load_model
+import pandas as pd
 import joblib
 from joblib import Parallel, delayed
 
@@ -19,7 +20,7 @@ names = ["Nearest Neighbors", "SVM", "Decision Tree", "Random Forest", "Neural N
 filenames = ["nearestneighbors", "svm", "decisiontree", "randomforest", "neuralnet", "adaboost", "naivebayes", "lda", "xgb"]
 inception_filenames = ["inception_epoch-02", "inception_epoch-05", "inception_epoch-08", "inception_epoch-final"]
 
-inception_model_path = '/path'
+# inception_model_path = '/path'
 classifiers = [
     KNeighborsClassifier(3),
     SVC(kernel="linear", C=0.025),
@@ -32,12 +33,12 @@ classifiers = [
     XGBClassifier()
     ]
 
-inception_models = [
-    load_model(inception_model_path + 'finetuned_model_epoch-02.hdf5'),
-    load_model(inception_model_path + 'finetuned_model_epoch-05.hdf5'),
-    load_model(inception_model_path + 'finetuned_model_epoch-08.hdf5'),
-    load_model(inception_model_path + 'finetuned_model_epoch-final.hdf5')
-    ]
+# inception_models = [
+#     load_model(inception_model_path + 'finetuned_model_epoch-02.hdf5'),
+#     load_model(inception_model_path + 'finetuned_model_epoch-05.hdf5'),
+#     load_model(inception_model_path + 'finetuned_model_epoch-08.hdf5'),
+#     load_model(inception_model_path + 'finetuned_model_epoch-final.hdf5')
+#     ]
 
 
 
@@ -50,12 +51,13 @@ X = np.array(X)
 
 print(X.shape)
 print(y.shape)
-y_array = np.array(label_binarize(y, range(len(set(y)))))
+# y_array = np.array(label_binarize(y, range(len(set(y)))))
+y_array = np.array(pd.get_dummies(y).as_matrix())
 
 X_train, X_test, y_train, y_test =  train_test_split(X, y, random_state=42)
 X_train, X_test, y_train_array, y_test_array =  train_test_split(X, y_array, random_state=42)
 
-joblib.dump((X_train, X_test, y_train, y_test), "testdata.joblib")
+joblib.dump((X_train, X_test, y_train_array, y_test_array), "testdata.joblib")
 print(np.array(y_test).shape)
 print(np.array(y_test_array).shape)
 

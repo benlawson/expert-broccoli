@@ -10,24 +10,31 @@ from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import average_precision_score
 import numpy as np
 import joblib
-from sklearn.preprocessing import label_binarize
+# from sklearn.preprocessing import label_binarize
+import pandas as pd
+from keras.models import load_model
 
 from itertools import cycle
 # setup plot details
-colors = cycle(['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:olive', 'tab:cyan'])
+# colors = cycle(['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:olive', 'tab:cyan'])
+colors = cycle(['b', 'g', 'r', 'c', 'm', 'y',])
 
-algos = ["Nearest Neighbors", "SVM", "Decision Tree", "Random Forest", "Single Layer Perceptron", "AdaBoost", "Naive Bayes", "LDA", "XGBoost"]
 
-filenames = ["nearestneighbors", "svm", "decisiontree", "randomforest", "neuralnet", "adaboost", "naivebayes", "lda", "xgb"]
+algos = ["Nearest Neighbors", "SVM", "Decision Tree",  "Single Layer Perceptron", "Naive Bayes", "LDA", "XGBoost", "Fine-tuned InceptionNet"]
+
+filenames = ["nearestneighbors", "svm", "decisiontree", "neuralnet",  "naivebayes", "lda", "xgb", 'inceptionnet_lol_no_joblib']
 
 n_classes = 11
 X_train, X_test, y_train, y_test = joblib.load("testdata.joblib")
-
+_, X_images, _, y_images = joblib.load("./imgs_testdata.joblib")
+print(y_images == y_test)
 
 # load classifier
 # For each class
 def calculate_p_r(y_test, y_predict):
     # A "micro-average": quantifying score on all classes jointly
+    print(y_test.shape)
+    print(y_predict.shape)
     precision, recall, _ = precision_recall_curve(y_test.ravel(), y_predict.ravel())
     average_precision = average_precision_score(y_test, y_predict, average="micro")
     return precision, recall, average_precision
@@ -35,12 +42,22 @@ def calculate_p_r(y_test, y_predict):
 precision, recall, average_precision = [], [], []
 
 for model_filename in filenames:
-    model = joblib.load("{0}.joblib".format(model_filename))
-    y_predict = model.predict(X_test)
+    try:
+        model = joblib.load("{0}.joblib".format(model_filename))
+        y_predict = model.predict_proba(X_test)
+    except FileNotFoundError:
+        model = load_model('/home/jlam17/Documents/Class/fall_2017/cs542/final_project/finetuned_model_epoch-final.hdf5')
+        y_predict = model.predict(np.array(X_images).reshape(-1, 299, 299, 3))
+    except AttributeError:
+        y_predict = model.predict(X_test)
+
+    print(model_filename)
     if type(y_predict[0]) == np.str_ or type(y_predict[0]) == np.int64:
-        y_predict = label_binarize(y_predict, range(n_classes))
+        # y_predict = label_binarize(y_predict, range(n_classes))
+        y_predict = np.array(pd.get_dummies(y_predict).as_matrix())
     if type(y_test[0]) == np.str_ or type(y_test[0]) == np.int64:
-        y_test= label_binarize(y_test, range(n_classes))
+        # y_test= label_binarize(y_test, range(n_classes))
+        y_test = np.array(pd.get_dummies(y_test).as_matrix())
     p, r, ap  = calculate_p_r(y_test, y_predict)
     precision.append(p)
     recall.append(r)
@@ -78,7 +95,7 @@ plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
 plt.xlabel('Recall')
 plt.ylabel('Precision')
-plt.title("Precision-Recall curves for some approaches based on PCA'd raw image data  representations")
+plt.title("Precision-Recall curves for the fine-tuned InceptionNet \nand some other approaches based on (non-fine-tuned) InceptionNet representations")
 lgd = plt.legend(lines, labels, loc='upper left', prop=dict(size=14), bbox_to_anchor=(1.02, 1))
 
-plt.savefig('algos_pca.png', bbox_extra_artists=(lgd,), bbox_inches="tight")
+plt.savefig('algos.png', bbox_extra_artists=(lgd,), bbox_inches="tight")
