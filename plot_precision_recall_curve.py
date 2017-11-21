@@ -37,9 +37,9 @@ precision, recall, average_precision = [], [], []
 for model_filename in filenames:
     model = joblib.load("{0}.joblib".format(model_filename))
     y_predict = model.predict(X_test)
-    if type(y_predict[0]) == int or type(y_predict[0]) == np.int64:
+    if type(y_predict[0]) == np.str_ or type(y_predict[0]) == np.int64:
         y_predict = label_binarize(y_predict, range(n_classes))
-    if type(y_test[0]) == int or type(y_test[0]) == np.int64:
+    if type(y_test[0]) == np.str_ or type(y_test[0]) == np.int64:
         y_test= label_binarize(y_test, range(n_classes))
     p, r, ap  = calculate_p_r(y_test, y_predict)
     precision.append(p)
