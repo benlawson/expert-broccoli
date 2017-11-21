@@ -34,7 +34,7 @@ reps = []
 labels = []
 for cat in sorted(cat_dict.keys()):
     print("representing {}".format(cat))
-    representations = model.predict(np.array(cat_dict[cat]))
+    representations = model.predict(np.array(cat_dict[cat])[:3])
     reps.extend(representations)
     for _ in range(len(cat_dict[cat])):
         labels.append(cat)

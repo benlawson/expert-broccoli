@@ -29,20 +29,12 @@ classifiers = [
     XGBClassifier()
     ]
 
-data = joblib.load("representations.joblib")
-
-X = []
-labels = []
-for label, key in enumerate(data):
-    for _ in data[key][0]:
-        labels.append(label)
-    for x in data[key]:
-        X.extend(x)
+X, labels = joblib.load("representations.joblib")
 
 y = np.array(labels)
 X = np.array(X)
 
-X = joblib.load("./pca_representations.joblib")
+#X = joblib.load("./pca_representations.joblib")
 
 print(X.shape)
 print(y.shape)
