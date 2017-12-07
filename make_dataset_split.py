@@ -16,7 +16,7 @@ y = []
  # filenames = sorted(glob.glob("/backupdrive/datasets/BUSampleDataSet/*.jpg"))
 for folder in sorted(glob.glob("../WinEarthPhotosByKeyword/*")):
     print(folder)
-    filenames = sorted(glob.glob(os.path.join(folder, "*.jpg")))[:2]
+    filenames = sorted(glob.glob(os.path.join(folder, "*.jpg")))
     for filename in filenames:
         image = img_to_array(load_img(filename, target_size=(299,299)))
         X.append(image)
