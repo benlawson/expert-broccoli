@@ -1,5 +1,7 @@
 # data files 
 *.joblib
+*.hdf5
+WinEarthPhotosByKeyword/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
