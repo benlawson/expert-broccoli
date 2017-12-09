@@ -27,7 +27,7 @@ model = InceptionV3(include_top=False, pooling='avg')
 cat_dict = defaultdict(list)
 
  # filenames = sorted(glob.glob("/backupdrive/datasets/BUSampleDataSet/*.jpg"))
-for folder in sorted(glob.glob("dataset/WinEarthPhotosByKeyword/*")):
+for folder in sorted(glob.glob("../WinEarthPhotosByKeyword/*")):
     print(folder)
     filenames = sorted(glob.glob(os.path.join(folder, "*.jpg")))
     for filename in filenames:

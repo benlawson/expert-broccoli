@@ -20,9 +20,9 @@ from itertools import cycle
 colors = cycle(['b', 'g', 'r', 'c', 'm', 'y',])
 
 
-algos = ["Nearest Neighbors", "SVM", "Decision Tree",  "Single Layer Perceptron", "Naive Bayes", "LDA", "XGBoost", "Fine-tuned InceptionNet"]
+algos = ["Nearest Neighbors", "SVM", "Decision Tree",  "Single Layer Perceptron", "Naive Bayes", "LDA", "XGBoost",]# "Fine-tuned InceptionNet"]
 
-filenames = ["nearestneighbors", "svm", "decisiontree", "neuralnet",  "naivebayes", "lda", "xgb", 'inceptionnet_lol_no_joblib']
+filenames = ["nearestneighbors", "svm", "decisiontree", "neuralnet",  "naivebayes", "lda", "xgb",]# 'inceptionnet_lol_no_joblib']
 
 n_classes = 11
 X_train, X_test, y_train, y_test = joblib.load("testdata.joblib")
@@ -95,7 +95,8 @@ plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
 plt.xlabel('Recall')
 plt.ylabel('Precision')
-plt.title("Precision-Recall curves for the fine-tuned InceptionNet \nand some other approaches based on (non-fine-tuned) InceptionNet representations")
+# plt.title("Precision-Recall curves for the fine-tuned InceptionNet \nand some other approaches based on (non-fine-tuned) InceptionNet representations")
+plt.title("Precision-Recall curves for some approaches based on PCA representations")
 lgd = plt.legend(lines, labels, loc='upper left', prop=dict(size=14), bbox_to_anchor=(1.02, 1))
 
 plt.savefig('algos.png', bbox_extra_artists=(lgd,), bbox_inches="tight")
