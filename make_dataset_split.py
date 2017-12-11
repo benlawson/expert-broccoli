@@ -3,11 +3,13 @@ import os
 import glob
 
 #external libraries
-# import numpy as np
+import numpy as np
 import joblib
 # from keras.applications.inception_v3 import InceptionV3 # ,preprocess_input
 # from keras.applications.resnet50 import ResNet50
 from keras.preprocessing.image import load_img, img_to_array
+from keras.applications.inception_v3 import preprocess_input as preprocess_input_inception
+from keras.applications.resnet50 import preprocess_input as preprocess_input_resnet
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import LabelBinarizer
 
@@ -26,6 +28,15 @@ def get_pca(data):
     pca = PCA(n_components=2048)
     return pca.fit_transform(images)
 
+def preprocess(imgs, model):
+    X = []
+    for img in imgs:
+        img = np.expand_dims(img, axis=0)
+        if model == 'inceptionnet': img = preprocess_input_inception(img)
+        if model == 'resnet': img = preprocess_input_resnet(img)
+        X.extend(img)
+    return np.array(X)
+
 print('Exlcuding movie in labels: {}'.format(exclude_movie))
 for folder in sorted(glob.glob("./WinEarthPhotosByKeyword/*")): # SPECIFY DIRECTORY
     # exlcude movie filter
@@ -39,6 +50,10 @@ for folder in sorted(glob.glob("./WinEarthPhotosByKeyword/*")): # SPECIFY DIRECT
         X_inception.append(image_inception)
         X_resnet.append(image_resnet)
         y.append(os.path.basename(folder))
+
+# preprocess imgs for finetuning InceptionNet and ResNet
+X_inception = preprocess(X_inception, 'inceptionnet')
+X_resnet = preprocess(X_inception, 'resnet')
 
 # initilize models
 # inception_model = InceptionV3(include_top=False, pooling='avg')
