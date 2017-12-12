@@ -27,9 +27,9 @@ from predict_help import calculate_p_r, plot_curve, filter_labels
 
 WITHOUT_MOVIE = True
 if WITHOUT_MOVIE:
-    prefix = "no_movie"
+    prefix = "without_movie"
 else:
-    prefix = ""
+    prefix = "with_movie"
 
 filenames = ["dummy", "nearestneighbors", "svm", "decisiontree", "neuralnet", "naivebayes", "lda", "xgb"]
 
@@ -55,6 +55,7 @@ def train_save(model, filename, representation_name):
     except ValueError:
         model = OneVsRestClassifier(model)
         model.fit(X_train, y_train)
+    # folder had prefix is in
     joblib.dump(model, os.path.join(folder, "{}.joblib".format(filename)))
     print("{0}: {1} acc".format(filename, model.score(X_test, y_test)))
 
@@ -63,28 +64,25 @@ one_hot, labels, _ = joblib.load(os.path.join(prefix, "labels_multiclass.joblib"
 y = np.argmax(one_hot, axis=1)
 y_array = np.array(one_hot)
 
-if WITHOUT_MOVIE:
-    representation_files = ['no_movie/pca_representation.joblib', "no_movie/inception_representations.joblib", "no_movie/resnet_representations.joblib"]
-else:
-    representation_files = ['pca_representation.joblib', "inception_representations.joblib", "resnet_representations.joblib"]
+representation_files = ['{0}/pca_representation.joblib'.format(prefix), "{0}/inception_representations.joblib".format(prefix), "{0}/resnet_representations.joblib".format(prefix)]
 
 
 # first is pca, then inception, then resnet
 looper = list(zip(representation_files, ['pca', 'inception', 'resnet']))[:-1]
 
-# for representation_filename, representation_name in looper:
+for representation_filename, representation_name in looper:
 
-#     # get the training data
-#     # all classifiers must use vector output
-#     X = joblib.load(representation_filename)
-#     X, y = filter_labels(X, y_array)
-#     print(X.shape)
-#     print(y.shape)
+    # get the training data
+    # all classifiers must use vector output
+    X = joblib.load(representation_filename)
+    X, y = filter_labels(X, y_array)
+    print(X.shape)
+    print(y.shape)
 
-#     X_train, X_test, y_train, y_test =  train_test_split(X, y, random_state=42)
+    X_train, X_test, y_train, y_test =  train_test_split(X, y, random_state=42)
 
-#     # train all the classifiers
-#     Parallel(n_jobs=-1)(delayed(train_save)(m, f,representation_name) for (m,f) in zip(classifiers, filenames))
+    # train all the classifiers
+    Parallel(n_jobs=-1)(delayed(train_save)(m, f,representation_name) for (m,f) in zip(classifiers, filenames))
 
 for representation_filename, representation_name in looper:
 
